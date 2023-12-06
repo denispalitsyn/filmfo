@@ -1,6 +1,8 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import MovieApi from './api';
-import { getRandomMinMax } from './utils';
+import { debounce, getRandomMinMax } from './utils';
+import { ReactComponent as Logo } from './assets/logo.svg';
+import { Input } from './components';
 
 const genreById = {
   action: 28,
@@ -25,6 +27,8 @@ function App() {
     documentary: [],
     western: [],
   });
+
+  const [isHeaderFloat, setIsHeaderFloat] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -56,55 +60,75 @@ function App() {
       .catch((error) => console.log(error));
   }, []);
 
-  console.log('movies', movies);
+  useEffect(() => {
+    const onScroll = debounce(() => {
+      if (window.scrollY > 100) {
+        setIsHeaderFloat(true);
+      } else {
+        setIsHeaderFloat(false);
+      }
+    }, 50);
 
-  const movieList = [
-    {
-      key: 'upcoming',
-      title: 'Upcoming Movies',
-    },
-    {
-      key: 'popular',
-      title: 'Popular Movies',
-    },
-    {
-      key: 'topRated',
-      title: 'Top Rated Movies',
-    },
-    {
-      key: 'adventure',
-      title: 'Adventure Movies',
-    },
-    {
-      key: 'comedy',
-      title: 'Comedy Movies',
-    },
-    {
-      key: 'action',
-      title: 'Action Movies',
-    },
-    {
-      key: 'horror',
-      title: 'Horror Movies',
-    },
-    {
-      key: 'fantasy',
-      title: 'Fantasy Movies',
-    },
-    {
-      key: 'documentary',
-      title: 'Documentary Movies',
-    },
-    {
-      key: 'western',
-      title: 'Western Movies',
-    },
-  ];
+    window.addEventListener('scroll', onScroll);
 
-  const randomMovie =
-    movies[movieList[getRandomMinMax(0, movieList.length - 1)].key][
-      getRandomMinMax(0, 19)
-    ];
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  const movieList = useMemo(
+    () => [
+      {
+        key: 'upcoming',
+        title: 'Upcoming Movies',
+      },
+      {
+        key: 'popular',
+        title: 'Popular Movies',
+      },
+      {
+        key: 'topRated',
+        title: 'Top Rated Movies',
+      },
+      {
+        key: 'adventure',
+        title: 'Adventure Movies',
+      },
+      {
+        key: 'comedy',
+        title: 'Comedy Movies',
+      },
+      {
+        key: 'action',
+        title: 'Action Movies',
+      },
+      {
+        key: 'horror',
+        title: 'Horror Movies',
+      },
+      {
+        key: 'fantasy',
+        title: 'Fantasy Movies',
+      },
+      {
+        key: 'documentary',
+        title: 'Documentary Movies',
+      },
+      {
+        key: 'western',
+        title: 'Western Movies',
+      },
+    ],
+    []
+  );
+
+  const randomMovie = useMemo(
+    () =>
+      movies[movieList[getRandomMinMax(0, movieList.length - 1)].key][
+        getRandomMinMax(0, 19)
+      ],
+    [movieList, movies]
+  );
 
   if (!randomMovie) {
     return <div>Loading...</div>;
@@ -112,6 +136,19 @@ function App() {
 
   return (
     <div className="min-h-screen">
+      <header
+        className={`${
+          isHeaderFloat ? 'bg-black' : 'bg-transparent'
+        } fixed top-0 left-0 right-0 z-10 transition-all duration-500`}
+      >
+        <div className="container mx-auto px-5 h-20 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <Logo className="w-9 h-9 cursor-pointer hover:-rotate-12 transition-all" />
+            <div className="text-2xl font-bold text-orange-500">Filmfo</div>
+          </div>
+          <Input />
+        </div>
+      </header>
       <div
         className="backdrop h-[80vh] max-w-full"
         style={{
