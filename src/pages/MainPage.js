@@ -1,61 +1,10 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
-import MovieApi from '../api';
+import { Fragment, useMemo } from 'react';
 import { getRandomMinMax } from '../utils';
-import { Backdrop, Footer, Header } from '../components';
-
-const genreById = {
-  action: 28,
-  adventure: 12,
-  comedy: 35,
-  documentary: 99,
-  fantasy: 14,
-  horror: 27,
-  western: 37,
-};
+import { Backdrop, Error, Footer, Header, Loader } from '../components';
+import { useMovies } from '../hooks';
 
 export function MainPage() {
-  const [movies, setMovies] = useState({
-    upcoming: [],
-    popular: [],
-    topRated: [],
-    adventure: [],
-    comedy: [],
-    action: [],
-    horror: [],
-    fantasy: [],
-    documentary: [],
-    western: [],
-  });
-
-  useEffect(() => {
-    Promise.all([
-      MovieApi.getUpcoming(),
-      MovieApi.getPopular(),
-      MovieApi.getTopRated(),
-      MovieApi.getMovieByGenreId(genreById.adventure),
-      MovieApi.getMovieByGenreId(genreById.comedy),
-      MovieApi.getMovieByGenreId(genreById.action),
-      MovieApi.getMovieByGenreId(genreById.horror),
-      MovieApi.getMovieByGenreId(genreById.fantasy),
-      MovieApi.getMovieByGenreId(genreById.documentary),
-      MovieApi.getMovieByGenreId(genreById.western),
-    ])
-      .then((responses) =>
-        setMovies({
-          upcoming: responses[0],
-          popular: responses[1],
-          topRated: responses[2],
-          adventure: responses[3],
-          comedy: responses[4],
-          action: responses[5],
-          horror: responses[6],
-          fantasy: responses[7],
-          documentary: responses[8],
-          western: responses[9],
-        })
-      )
-      .catch((error) => console.log(error));
-  }, []);
+  const { movies, isLoading, error } = useMovies();
 
   const movieList = useMemo(
     () => [
@@ -111,8 +60,12 @@ export function MainPage() {
     [movieList, movies]
   );
 
-  if (!randomMovie) {
-    return <div>Loading...</div>;
+  if (error) {
+    return <Error error={error} />;
+  }
+
+  if (isLoading || !randomMovie) {
+    return <Loader />;
   }
 
   return (
