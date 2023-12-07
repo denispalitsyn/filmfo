@@ -5,7 +5,7 @@ import { ReactComponent as In } from '../assets/in.svg';
 
 export function Footer() {
   return (
-    <div className="pt-24 pb-5">
+    <div className="pt-24 pb-5 mt-auto">
       <div className="flex gap-5 justify-center items-center mb-4">
         <Link
           to={'https://t.me/denis_palitsyn'}
