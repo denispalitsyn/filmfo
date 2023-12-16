@@ -1,6 +1,6 @@
 import { Fragment, useMemo } from 'react';
 import { getRandomMinMax } from '../utils';
-import { Backdrop, Error, Footer, Header, Loader, Poster } from '../components';
+import { Backdrop, Error, Footer, Loader, Poster } from '../components';
 import { useMovies } from '../hooks';
 import { useNavigate } from 'react-router-dom';
 
@@ -75,10 +75,9 @@ export function MainPage() {
 
   return (
     <>
-      <Header />
       <Backdrop backdropPath={randomMovie.backdrop_path}>
         <div className="container mx-auto px-5 pt-[30vh]">
-          <h2 className="text-8xl font-bold line-clamp-1 mb-5">
+          <h2 className="text-5xl xl:text-8xl font-bold line-clamp-1 mb-5">
             {randomMovie.original_title}
           </h2>
           <button

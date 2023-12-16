@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Backdrop, Error, Footer, Header, Loader, Poster } from '../components';
+import { Backdrop, Error, Footer, Loader, Poster } from '../components';
 import { useMovie } from '../hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
@@ -66,16 +66,22 @@ export function MoviePage() {
 
   return (
     <>
-      <Header />
       <Backdrop backdropPath={backdrop_path}>
         <div className="container mx-auto px-5 pt-[20vh] flex gap-10">
-          <div>
-            <img
-              src={`https://image.tmdb.org/t/p/w300${poster_path}`}
-              alt={original_title}
-              width={300}
-              height={450}
-            />
+          <div className="hidden sm:block">
+            {poster_path ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w300${poster_path}`}
+                alt={original_title}
+                width={300}
+                height={450}
+                className="min-w-[300px] h-[450px]"
+              />
+            ) : (
+              <div className="min-w-[300px] h-[450px] bg-slate-700 flex justify-center items-center">
+                Image not found
+              </div>
+            )}
           </div>
           <div>
             <h2 className="text-5xl font-bold line-clamp-2 mb-5">
@@ -95,82 +101,86 @@ export function MoviePage() {
           </div>
         </div>
       </Backdrop>
-      {cast ? (
-        <div className="container mx-auto px-5 mt-20">
-          <h2 className="mb-5 font-bold text-2xl">Cast</h2>
-          <div className="overflow-auto overflow-y-hidden scrollbar-none">
-            <div className="flex gap-10">
-              {cast
-                .slice(0, 20)
-                .map(({ id, name, character, profile_path }, index) => (
-                  <div key={'cast' + index + id}>
-                    {profile_path ? (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w200${profile_path}`}
-                        alt={name}
-                        width={150}
-                        height={225}
-                        className="block min-w-[150px] h-[225px] rounded-lg mb-5"
-                      />
-                    ) : (
-                      <div className="min-w-[150px] h-[225px] bg-slate-700 flex justify-center items-center rounded-lg mb-5">
-                        Image not found
+      {cast?.length || crew?.length || similarMovies?.length ? (
+        <div className="container mx-auto px-5 mt-20 flex flex-col gap-10">
+          {cast?.length ? (
+            <div>
+              <h2 className="mb-5 font-bold text-2xl">Cast</h2>
+              <div className="overflow-auto overflow-y-hidden scrollbar-none">
+                <div className="flex gap-10">
+                  {cast
+                    .slice(0, 20)
+                    .map(({ id, name, character, profile_path }, index) => (
+                      <div key={'cast' + index + id} className="w-[150px]">
+                        {profile_path ? (
+                          <img
+                            src={`https://image.tmdb.org/t/p/w200${profile_path}`}
+                            alt={name}
+                            width={150}
+                            height={225}
+                            className="block min-w-[150px] h-[225px] rounded-lg mb-5"
+                          />
+                        ) : (
+                          <div className="min-w-[150px] h-[225px] bg-slate-700 flex justify-center items-center rounded-lg mb-5">
+                            Image not found
+                          </div>
+                        )}
+                        <div className="text-center">
+                          <div className="text-xl font-bold">{name}</div>
+                          <div className="text-orange-500">{character}</div>
+                        </div>
                       </div>
-                    )}
-                    <div className="text-center">
-                      <div className="text-xl font-bold">{name}</div>
-                      <div className="text-orange-500">{character}</div>
-                    </div>
-                  </div>
-                ))}
+                    ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      ) : null}
-      {crew ? (
-        <div className="container mx-auto px-5 mt-10">
-          <h2 className="mb-5 font-bold text-2xl">Crew</h2>
-          <div className="overflow-auto overflow-y-hidden scrollbar-none">
-            <div className="flex gap-10">
-              {crew
-                .slice(0, 20)
-                .map(({ id, name, department, profile_path }, index) => (
-                  <div key={'cast' + index + id}>
-                    {profile_path ? (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w200${profile_path}`}
-                        alt={name}
-                        width={150}
-                        height={225}
-                        className="block min-w-[150px] h-[225px] rounded-lg mb-5"
-                      />
-                    ) : (
-                      <div className="min-w-[150px] h-[225px] bg-slate-700 flex justify-center items-center rounded-lg mb-5">
-                        Image not found
+          ) : null}
+          {crew?.length ? (
+            <div>
+              <h2 className="mb-5 font-bold text-2xl">Crew</h2>
+              <div className="overflow-auto overflow-y-hidden scrollbar-none">
+                <div className="flex gap-10">
+                  {crew
+                    .slice(0, 20)
+                    .map(({ id, name, department, profile_path }, index) => (
+                      <div key={'cast' + index + id}>
+                        {profile_path ? (
+                          <img
+                            src={`https://image.tmdb.org/t/p/w200${profile_path}`}
+                            alt={name}
+                            width={150}
+                            height={225}
+                            className="block min-w-[150px] h-[225px] rounded-lg mb-5"
+                          />
+                        ) : (
+                          <div className="min-w-[150px] h-[225px] bg-slate-700 flex justify-center items-center rounded-lg mb-5">
+                            Image not found
+                          </div>
+                        )}
+                        <div className="text-center">
+                          <div className="text-xl font-bold">{name}</div>
+                          <div className="text-orange-500">{department}</div>
+                        </div>
                       </div>
-                    )}
-                    <div className="text-center">
-                      <div className="text-xl font-bold">{name}</div>
-                      <div className="text-orange-500">{department}</div>
-                    </div>
-                  </div>
-                ))}
+                    ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      ) : null}
-      {similarMovies ? (
-        <div className="container mx-auto px-5 mt-10">
-          <h2 className="mb-5 font-bold text-2xl">Similar Movies</h2>
-          <div className="scrollbar-none overflow-x-auto overflow-y-hidden flex gap-10">
-            {similarMovies.map((movie) => (
-              <Poster
-                key={movie.id}
-                {...movie}
-                onClick={() => navigate(`/movie/${movie.id}`)}
-              />
-            ))}
-          </div>
+          ) : null}
+          {similarMovies?.length ? (
+            <div>
+              <h2 className="mb-5 font-bold text-2xl">Similar Movies</h2>
+              <div className="scrollbar-none overflow-x-auto overflow-y-hidden flex gap-10">
+                {similarMovies.map((movie) => (
+                  <Poster
+                    key={movie.id}
+                    {...movie}
+                    onClick={() => navigate(`/movie/${movie.id}`)}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
       <Footer />
@@ -183,10 +193,10 @@ export function MoviePage() {
       >
         <div
           ref={ref}
-          className="fixed top-0 right-0 bottom-0 left-0 z-20 bg-black bg-opacity-80 flex justify-center items-center"
+          className="fixed top-0 right-0 bottom-0 left-0 z-20 bg-black bg-opacity-80 flex items-center px-5"
           onClick={() => setIsModalOpen(false)}
         >
-          <div>
+          <div className="w-full max-w-4xl mx-auto">
             <div className="w-5 h-5 relative mb-5 cursor-pointer hover:opacity-70 ml-auto">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-[2px] rotate-45 bg-white"></div>
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-[2px] -rotate-45 bg-white"></div>
@@ -196,9 +206,10 @@ export function MoviePage() {
               height="450"
               src={videoSrc}
               title="YouTube video player"
-              frameborder="0"
+              frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
+              allowFullScreen
+              className="w-full"
             ></iframe>
           </div>
         </div>
